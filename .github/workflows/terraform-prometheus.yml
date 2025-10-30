@@ -92,3 +92,14 @@ jobs:
         with:
           name: prometheus-config
           path: monitoring/prometheus.yml
+          
+            # Optional: Commit the generated file back to the repo (disabled by default)
+      - name: Commit generated prometheus.yml (optional)
+        if: github.event_name == 'workflow_dispatch' && env.COMMIT_GENERATED == 'true'
+        on:
+          workflow_dispatch: {}
+          # Trigger on push to the main branches (all paths) and on pull requests targeting them.
+          push:
+            branches: [ 'master', 'main' ]
+          pull_request:
+            branches: [ 'master', 'main' ]

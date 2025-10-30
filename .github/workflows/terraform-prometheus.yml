@@ -1,7 +1,6 @@
 name: Terraform Apply - Generate Prometheus config
 
 on:
-  workflow_dispatch: {}
   push:
     branches: [ 'master' ]
     paths:

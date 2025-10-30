@@ -3,10 +3,6 @@ name: Terraform Apply - Generate Prometheus config
 on:
   push:
     branches: [ 'master' ]
-    paths:
-      - 'main.tf'
-      - 'outputs.tf'
-      - 'monitoring/**'
 
 jobs:
   terraform:

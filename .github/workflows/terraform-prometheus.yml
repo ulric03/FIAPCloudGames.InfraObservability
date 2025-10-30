@@ -107,4 +107,3 @@ jobs:
             branches: [ 'master', 'main' ]
           pull_request:
             branches: [ 'master', 'main' ]
-          git push

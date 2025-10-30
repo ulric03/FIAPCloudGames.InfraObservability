@@ -1,4 +1,4 @@
-name: Terraform Apply - Generate Prometheus config
+name: Terraform Apply - Generate Prometheus configa
 
 on:
   workflow_dispatch: {}

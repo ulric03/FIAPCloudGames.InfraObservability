@@ -123,12 +123,37 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.0"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
   }
   required_version = ">= 1.1.0"
 }
 
 provider "azurerm" {
   features {}
+}
+
+
+# Gera o arquivo de configuração do Prometheus localmente com os FQDNs das Container Apps
+resource "local_file" "prometheus_config" {
+  filename = "${path.module}/monitoring/prometheus.yml"
+  content  = templatefile("${path.module}/monitoring/prometheus.tpl", {
+    prometheus = azurerm_container_app.prometheus.latest_revision_fqdn
+    loki       = azurerm_container_app.loki.latest_revision_fqdn
+    grafana    = azurerm_container_app.grafana.latest_revision_fqdn
+    # mantendo serviços locais (ex.: APIs) como antes; ajuste se necessário
+    users_api  = "users-api:5000"
+    games_api  = "games-api:5000"
+  })
+
+  # Garantir que o arquivo seja reescrito quando os FQDN mudarem
+  depends_on = [
+    azurerm_container_app.prometheus,
+    azurerm_container_app.loki,
+    azurerm_container_app.grafana,
+  ]
 }
 
 

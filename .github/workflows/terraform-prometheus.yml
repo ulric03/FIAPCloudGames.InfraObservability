@@ -1,4 +1,4 @@
-name: Terraform Apply - Generate Prometheus configa
+name: Terraform Apply - Generate Prometheus config
 
 on:
   workflow_dispatch: {}
@@ -30,6 +30,61 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set ARM_* env vars for Terraform (extract from AZURE_CREDENTIALS or separate secrets)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # install jq for JSON parsing
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
+
+          # try to extract from AZURE_CREDENTIALS JSON first
+          SUB=""
+          CLIENT_ID=""
+          CLIENT_SECRET=""
+          TENANT_ID=""
+          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then
+            echo "Parsing AZURE_CREDENTIALS..." >/dev/null
+            echo '${{ secrets.AZURE_CREDENTIALS }}' > /tmp/azcreds.json
+            SUB=$(jq -r '.subscriptionId // empty' /tmp/azcreds.json)
+            CLIENT_ID=$(jq -r '.clientId // empty' /tmp/azcreds.json)
+            CLIENT_SECRET=$(jq -r '.clientSecret // empty' /tmp/azcreds.json)
+            TENANT_ID=$(jq -r '.tenantId // empty' /tmp/azcreds.json)
+          fi
+
+          # fallback to separate secrets if any value missing
+          if [ -z "$SUB" ]; then
+            SUB="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          fi
+          if [ -z "$CLIENT_ID" ]; then
+            CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}"
+          fi
+          if [ -z "$CLIENT_SECRET" ]; then
+            CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}"
+          fi
+          if [ -z "$TENANT_ID" ]; then
+            TENANT_ID="${{ secrets.AZURE_TENANT_ID }}"
+          fi
+
+          # Validate we have required values
+          if [ -z "$SUB" ] || [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ] || [ -z "$TENANT_ID" ]; then
+            echo "ERROR: Missing Azure authentication values for Terraform."
+            echo "Ensure either AZURE_CREDENTIALS (from 'az ad sp create-for-rbac --sdk-auth') contains subscriptionId, clientId, clientSecret and tenantId, or set the individual secrets: AZURE_SUBSCRIPTION_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID."
+            echo "You can create a suitable JSON with: az ad sp create-for-rbac --sdk-auth"
+            exit 1
+          fi
+
+          # Export for Terraform AzureRM provider
+          echo "ARM_SUBSCRIPTION_ID=$SUB" >> $GITHUB_ENV
+          echo "ARM_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$TENANT_ID" >> $GITHUB_ENV
+
+          # Mask lengths (for debugging only) - will not print secret values
+          echo "Azure auth values normalized. subscriptionId length: ${#SUB}" >/dev/null
 
       - name: Terraform Init
         run: terraform init

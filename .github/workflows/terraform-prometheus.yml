@@ -56,16 +56,16 @@ jobs:
 
           # fallback to separate secrets if any value missing
           if [ -z "$SUB" ]; then
-            SUB="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+            SUB="${{ secrets.ARM_SUBSCRIPTION_ID }}"
           fi
           if [ -z "$CLIENT_ID" ]; then
-            CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}"
+            CLIENT_ID="${{ secrets.ARM_CLIENT_ID }}"
           fi
           if [ -z "$CLIENT_SECRET" ]; then
-            CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}"
+            CLIENT_SECRET="${{ secrets.ARM_CLIENT_SECRET }}"
           fi
           if [ -z "$TENANT_ID" ]; then
-            TENANT_ID="${{ secrets.AZURE_TENANT_ID }}"
+            TENANT_ID="${{ secrets.ARM_TENANT_ID }}"
           fi
 
           # Validate we have required values

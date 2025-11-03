@@ -31,7 +31,7 @@ resource "azurerm_container_app" "prometheus" {
   template {
     container {
       name   = "prometheus"
-      image  = "prom/prometheus:latest"
+      image  = "997353105/prometheus-fcg:latest"
       cpu    = 0.5
       memory = "1Gi"
     }

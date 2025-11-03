@@ -11,11 +11,6 @@ variable "resource_group_location" {
   default     = "brazilsouth"
 }
 
-variable "storage_account_name" {
-  description = "Storage Prometheus"
-  type        = string
-  default     = "promstor${random_id.suffix.hex}"
-}
 
 ## Data source para buscar o ID do ambiente gerenciado pelo nome
 data "azurerm_container_app_environment" "observability_env" {
@@ -136,7 +131,7 @@ resource "random_id" "suffix" {
 }
 
 resource "azurerm_storage_account" "prom" {
-  name                     = var.storage_account_name
+  name                     = "promstor${random_id.suffix.hex}"
   resource_group_name      = var.resource_group_name
   location                 = var.resource_group_location
   account_tier             = "Standard"

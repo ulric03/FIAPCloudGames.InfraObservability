@@ -11,6 +11,11 @@ variable "resource_group_location" {
   default     = "brazilsouth"
 }
 
+variable "storage_account_name" {
+  description = "Storage Prometheus"
+  type        = string
+  default     = "promstor${random_id.suffix.hex}"
+}
 
 ## Data source para buscar o ID do ambiente gerenciado pelo nome
 data "azurerm_container_app_environment" "observability_env" {
@@ -34,6 +39,10 @@ resource "azurerm_container_app" "prometheus" {
       image  = "prom/prometheus:latest"
       cpu    = 0.5
       memory = "1Gi"
+      volume_mount {
+        name       = "prometheus-config"
+        mount_path = "/etc/prometheus"
+      }
     }
   }
 
@@ -43,6 +52,15 @@ resource "azurerm_container_app" "prometheus" {
     traffic_weight {
       percentage      = 100
       latest_revision = true
+    }
+  }
+  
+  volume {
+    name = "prometheus-config"
+    azure_file {
+      share_name           = azurerm_storage_share.prometheus.name
+      storage_account_name = azurerm_storage_account.prom.name
+      storage_account_key  = data.azurerm_storage_account_keys.prom.keys[0].value
     }
   }
 
@@ -113,6 +131,28 @@ resource "azurerm_container_app" "loki" {
   }
 }
 
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "azurerm_storage_account" "prom" {
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.resource_group_location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_share" "prometheus" {
+  name                 = "prometheus-config"
+  storage_account_name = azurerm_storage_account.prom.name
+  quota                = 1
+}
+
+data "azurerm_storage_account_keys" "prom" {
+  name                = azurerm_storage_account.prom.name
+  resource_group_name = var.resource_group_name
+}
 
 
 # Provider Azure e configuração inicial

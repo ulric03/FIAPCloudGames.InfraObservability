@@ -9,16 +9,16 @@ scrape_configs:
 
   - job_name: 'loki'
     static_configs:
-      - targets: ['loki--ks0m2f1.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3100']
+      - targets: ['loki.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3100']
 
   - job_name: 'grafana'
     static_configs:
-      - targets: ['grafana--d8m1edh.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3000']
+      - targets: ['grafana.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3000']
   
   - job_name: 'users-api'
     static_configs:
-      - targets: ['users-api:5000']
+      - targets: ['users-api:5001']
 
   - job_name: 'games-api'
     static_configs:
-      - targets: ['games-api:5000']
+      - targets: ['games-api:5001']

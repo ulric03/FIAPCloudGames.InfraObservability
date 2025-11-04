@@ -20,29 +20,24 @@ jobs:
 
       - name: Create/Update Azure Container App 'loki'
         run: |
-         echo "Verificando se o aplicativo de contêiner 'loki' existe..."
-         if az containerapp show --name loki --resource-group Fase-3 &> /dev/null; then
-         echo "if true"
-         else 
-         echo "if false"
-         fi
-         if az containerapp show --name loki --resource-group Fase-3 &> /dev/null; then
-          az containerapp update \
-            --name loki \
-            --resource-group Fase-3 \
-            --image grafana/loki:latest \
-            --environment managedEnvironment-Fase-3 \
-            --ingress external \
-            --target-port 3100 \
-         else
-          az containerapp create \
-            --name loki \
-            --resource-group Fase-3 \
-            --environment managedEnvironment-Fase-3 \
-            --image grafana/loki:latest \
-            --ingress external \
-            --target-port 3100 \
-            --cpu 0.5 \
-            --memory 1Gi
-         fi
+          if az containerapp show --name loki --resource-group Fase-3 &> /dev/null; then
+            echo "Atualizando o container app 'loki'..."
+            az containerapp update \
+              --name loki \
+              --resource-group Fase-3 \
+              --image grafana/loki:latest \
+              --cpu 0.5 \
+              --memory 1Gi
+          else
+            echo "Criando o container app 'loki'..."
+            az containerapp create \
+              --name loki \
+              --resource-group Fase-3 \
+              --environment managedEnvironment-Fase-3 \
+              --image grafana/loki:latest \
+              --ingress external \
+              --target-port 3100 \
+              --cpu 0.5 \
+              --memory 1Gi
+          fi
         shell: bash

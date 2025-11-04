@@ -20,9 +20,23 @@ jobs:
 
       - name: Create/Update Azure Container App 'grafana'
         run: |
+         if az containerapp show --name grafana --resource-group Fase-3 &> /dev/null; then
           az containerapp update \
             --name grafana \
             --resource-group Fase-3 \
             --image grafana/grafana:latest \
+            --environment managedEnvironment-Fase-3 \
+            --ingress external \
+            --target-port 3000 \
+         else
+          az containerapp create \
+            --name grafana \
+            --resource-group Fase-3 \
+            --environment managedEnvironment-Fase-3 \
+            --image grafana/grafana:latest \
+            --ingress external \
+            --target-port 3000 \
             --cpu 0.5 \
             --memory 1Gi
+         fi
+        shell: bash

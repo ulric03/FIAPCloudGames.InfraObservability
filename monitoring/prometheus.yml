@@ -5,15 +5,15 @@ scrape_configs:
 
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['prometheus--5yggd2p.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:9090']
+      - targets: ['prometheus--64sejnv.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:9090']
 
   - job_name: 'loki'
     static_configs:
-      - targets: ['loki--536znq2.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3100']
+      - targets: ['loki--ks0m2f1.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3100']
 
   - job_name: 'grafana'
     static_configs:
-      - targets: ['grafana--6lad6wl.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3000']
+      - targets: ['grafana--d8m1edh.wittymeadow-ceeb0d9e.brazilsouth.azurecontainerapps.io:3000']
   
   - job_name: 'users-api'
     static_configs:

@@ -15,7 +15,7 @@ jobs:
 
       - name: Build Prometheus custom image
         run: |
-          docker build -f DockerFile -t 997353105/prometheus-fcg:custom .
+          docker build -f Dockerfile -t 997353105/prometheus-fcg:custom .
           echo "Imagem Prometheus customizada buildada."
 
       - name: Login no Docker Hub

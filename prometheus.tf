@@ -1,21 +1,3 @@
-# Variáveis para resource group existente
-variable "resource_group_name" {
-  description = "Nome do resource group já existente no Azure."
-  type        = string
-  default     = "Fase-3"
-}
-
-variable "resource_group_location" {
-  description = "Localização do resource group já existente no Azure."
-  type        = string
-  default     = "brazilsouth"
-}
-
-## Data source para buscar o ID do ambiente gerenciado pelo nome
-data "azurerm_container_app_environment" "observability_env" {
-  name                = "managedEnvironment-Fase-3"
-  resource_group_name = var.resource_group_name
-}
 
 ## Azure Container App - Observability Stack (Prometheus)
 

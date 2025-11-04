@@ -19,37 +19,7 @@ data "azurerm_container_app_environment" "observability_env" {
 }
 
 
-## Azure Container App - Observability Stack (Prometheus, Grafana, Loki juntos)
-
-
-resource "azurerm_container_app" "prometheus" {
-  revision_mode                = "Single"
-  name                         = "prometheus"
-  resource_group_name          = var.resource_group_name
-  container_app_environment_id = data.azurerm_container_app_environment.observability_env.id
-
-  template {
-    container {
-      name   = "prometheus"
-      image  = "997353105/prometheus-fcg:custom"
-      cpu    = 0.5
-      memory = "1Gi"
-    }
-  }
-
-  ingress {
-    external_enabled = true
-    target_port      = 9090
-    traffic_weight {
-      percentage      = 100
-      latest_revision = true
-    }
-  }
-
-  tags = {
-    environment = "observability"
-  }
-}
+## Azure Container App - Observability Stack (Grafana, Loki juntos)
 
 resource "azurerm_container_app" "grafana" {
   revision_mode                = "Single"
@@ -134,28 +104,4 @@ terraform {
 provider "azurerm" {
   features {}
 }
-
-
-# Gera o arquivo de configuração do Prometheus localmente com os FQDNs das Container Apps
-resource "local_file" "prometheus_config" {
-  filename = "${path.module}/monitoring/prometheus.yml"
-  content  = templatefile("${path.module}/monitoring/prometheus.tpl", {
-    prometheus = azurerm_container_app.prometheus.latest_revision_fqdn
-    loki       = azurerm_container_app.loki.latest_revision_fqdn
-    grafana    = azurerm_container_app.grafana.latest_revision_fqdn
-    # mantendo serviços locais (ex.: APIs) como antes; ajuste se necessário
-    users_api  = "users-api:5000"
-    games_api  = "games-api:5000"
-  })
-
-  # Garantir que o arquivo seja reescrito quando os FQDN mudarem
-  depends_on = [
-    azurerm_container_app.prometheus,
-    azurerm_container_app.loki,
-    azurerm_container_app.grafana,
-  ]
-}
-
-
-
 

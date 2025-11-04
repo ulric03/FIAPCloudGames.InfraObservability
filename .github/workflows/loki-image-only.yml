@@ -1,0 +1,28 @@
+name: Build/Push Loki Image Only
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/loki-image-only.yml
+
+jobs:
+  build-push-loki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create/Update Azure Container App 'loki'
+        run: |
+          az containerapp update \
+            --name loki \
+            --resource-group Fase-3 \
+            --image grafana/loki:latest \
+            --cpu 0.5 \
+            --memory 1Gi

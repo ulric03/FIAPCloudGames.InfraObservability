@@ -1,0 +1,28 @@
+name: Build/Push Grafana Image Only
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/grafana-image-only.yml
+
+jobs:
+  build-push-grafana:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create/Update Azure Container App 'grafana'
+        run: |
+          az containerapp update \
+            --name grafana \
+            --resource-group Fase-3 \
+            --image grafana/grafana:latest \
+            --cpu 0.5 \
+            --memory 1Gi

@@ -1,0 +1,41 @@
+name: Build/Push Prometheus Image Only
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/prometheus-image-only.yml
+
+jobs:
+  build-push-prometheus:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Prometheus custom image
+        run: |
+          docker build -f DockerFile -t 997353105/prometheus-fcg:custom .
+          echo "Imagem Prometheus customizada buildada."
+
+      - name: Login no Docker Hub
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Push Prometheus custom image
+        run: docker push 997353105/prometheus-fcg:custom
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+            - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create/Update Azure Container App 'prometheus'
+        run: |
+          az containerapp update \
+            --name prometheus \
+            --resource-group Fase-3 \
+            --image 997353105/prometheus-fcg:custom \
+            --cpu 0.5 \
+            --memory 1Gi

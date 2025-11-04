@@ -34,9 +34,24 @@ jobs:
 
       - name: Create/Update Azure Container App 'prometheus'
         run: |
-          az containerapp update \
-            --name prometheus \
-            --resource-group Fase-3 \
-            --image 997353105/prometheus-fcg:custom \
-            --cpu 0.5 \
-            --memory 1Gi
+          if az containerapp show --name prometheus --resource-group Fase-3 &> /dev/null; then
+            echo "Atualizando o container app 'prometheus'..."
+            az containerapp update \
+              --name prometheus \
+              --resource-group Fase-3 \
+              --image 997353105/prometheus-fcg:custom \
+              --cpu 0.5 \
+              --memory 1Gi
+          else
+            echo "Criando o container app 'prometheus'..."
+            az containerapp create \
+              --name prometheus \
+              --resource-group Fase-3 \
+              --environment managedEnvironment-Fase-3 \
+              --image 997353105/prometheus-fcg:custom \
+              --ingress external \
+              --target-port 9090 \
+              --cpu 0.5 \
+              --memory 1Gi
+          fi
+        shell: bash

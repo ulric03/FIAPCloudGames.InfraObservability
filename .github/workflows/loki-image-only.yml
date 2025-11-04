@@ -20,6 +20,12 @@ jobs:
 
       - name: Create/Update Azure Container App 'loki'
         run: |
+         echo "Verificando se o aplicativo de contêiner 'loki' existe..."
+         if az containerapp show --name loki --resource-group Fase-3 &> /dev/null; then
+         echo "if true"
+         else 
+         echo "if false"
+         fi
          if az containerapp show --name loki --resource-group Fase-3 &> /dev/null; then
           az containerapp update \
             --name loki \

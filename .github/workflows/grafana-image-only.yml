@@ -26,8 +26,8 @@ jobs:
               --name grafana \
               --resource-group Fase-3 \
               --image grafana/grafana:latest \
-              --cpu 0.5 \
-              --memory 1Gi
+              --cpu 1 \
+              --memory 2Gi
               --env-vars GF_METRICS_ENABLED=true
           else
             echo "Criando o container app 'grafana'..."
@@ -38,8 +38,8 @@ jobs:
               --image grafana/grafana:latest \
               --ingress external \
               --target-port 3000 \
-              --cpu 0.5 \
-              --memory 1Gi
+              --cpu 1 \
+              --memory 2Gi
               --env-vars GF_METRICS_ENABLED=true
           fi
         shell: bash

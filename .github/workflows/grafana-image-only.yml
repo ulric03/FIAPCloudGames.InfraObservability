@@ -28,6 +28,7 @@ jobs:
               --image grafana/grafana:latest \
               --cpu 0.5 \
               --memory 1Gi
+              --env-vars GF_METRICS_ENABLED=true
           else
             echo "Criando o container app 'grafana'..."
             az containerapp create \
@@ -39,5 +40,6 @@ jobs:
               --target-port 3000 \
               --cpu 0.5 \
               --memory 1Gi
+              --env-vars GF_METRICS_ENABLED=true
           fi
         shell: bash
